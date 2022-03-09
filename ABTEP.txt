@@ -1,0 +1,2147 @@
+1.Components
+  we can generate through cli(ng g c component-name) or we can create manually(if we do like this then we need to import our component in Declartions array in @NgModule object in App.module.ts).
+        Ex:-  import { Component, OnInit } from '@angular/core';
+
+                   @Component({
+                             selector: 'app-warning-alert',
+                               templateUrl: './warning-alert.component.html',
+                             styleUrls: ['./warning-alert.component.css']
+                        })
+
+                    export class WarningAlertComponent  implements OnInit{
+                         constructor() { }
+	       ngOnInit(): void { }
+                     }
+          In App.module.ts:-
+               import { SuccessAlertComponent } from './success-alert/success-alert/success-alert.component';
+
+                      @NgModule({
+                             declarations: [
+                                       AppComponent,
+                                       SuccessAlertComponent
+                                ],
+                               imports: [
+                                       BrowserModule,
+                                       AppRoutingModule,
+                                       FormsModule
+                                 ],
+                                providers: [],
+                                bootstrap: [AppComponent]
+                            })
+*In component we have component metdata and component class.
+*In metadata we have information about component in the form of "Selector", "template/templateUrl" & styles/styleUrl" 
+selector:- we can use this to refer the particalar compnent, we can do this in three ways
+   a)@Component({
+  selector: 'app-success-alert',
+  templateUrl: './success-alert.component.html',
+  styleUrls: ['./success-alert.component.css']
+   })
+   we can use this like <app-success-alert></app-success-alert>
+   b)@Component({
+  selector: '#appSuccessAlert',
+  templateUrl: './success-alert.component.html',
+  styleUrls: ['./success-alert.component.css']
+   })
+   HTML:-<div appSuccessAlert></div>
+   c)@Component({
+  selector: '.app-success-alert',
+  templateUrl: './success-alert.component.html',
+  styleUrls: ['./success-alert.component.css']
+  })
+  HTML:-<div class="app-success-alert"></div>
+template/templateUrl:
+  a)@Component({
+  selector: 'app-success-alert',
+  templateUrl: './success-alert.component.html',
+  styleUrls: ['./success-alert.component.css']
+  })
+  b)@Component({
+  selector: 'app-success-alert',
+  template: `<p>hello world this is inline template.</p>`,
+  styleUrls: ['./success-alert.component.css']
+  })
+styles/styleUrls:
+  a)@Component({
+  selector: 'app-success-alert',
+  templateUrl: './success-alert.component.html',
+  styleUrls: ['./success-alert.component.css','./warning-alert.component.css'] NOTE:- we can use multiple stylesheets here. 
+   })
+   b)@Component({
+    selector: 'app-warning-alert',
+    templateUrl: './warning-alert.component.html',
+    styles: [
+       ` p {
+            padding:20px;
+            background-color: red;
+            border:2px solid red;
+
+        }
+        .SAFE{
+            color:red;         
+           }
+        `
+         ]
+      })
+2.Data Binding:
+*Interpolation 
+  ex: {{ varName }}
+*Property Binding 
+  ex: [propertyName] = "varName"
+*Event Binding
+  ex: (event)="eventHandler()"
+         eventHandler() {
+             console.log("in event handler");
+           }
+*Two way Binding        
+   ex:<input type="text" [(ngModel)]="varName">
+        <p>{{ varName }}</p>
+3.Directives(Inbuilt):
+    a)*ngIf(Structural Directive)
+        ex:<p *ngIf="varName">hi there</p>    
+       display p tag only if varName having true or having something  in it.
+    b)*ngIf with else
+         ex:<p *ngIf="varName; else refVariable">hi there</p>
+               <ng-template #refVariable>
+               <div></div>
+               </ng-template>
+     c)ngStyle(Attribute Directive)
+         ex:<h6 [ngStyle]="{backgroundColor: getColor()}">This area is {{state}}</h6>
+                state='SAFE';
+               getColor(){
+                 return this.state === 'SAFE'? 'green':'red';
+                }
+      d)ngClass(Attribute Directive)
+          ex:<h6 [ngClass]="{SAFE: state === 'SAFE'}">I am {{state}}</h6>
+               @Component({
+                      selector: 'app-warning-alert',
+                      templateUrl: './warning-alert.component.html',
+    	    styles: [` .SAFE{
+            		color:red;
+            		 }` ]
+                     })
+      e)*ngFor(Structural Directives)
+           ex:<div *ngFor="let log of logs; let i = index">{{log}}</div>
+	logs=[1,2,3]
+      f)*ngSwitch(Structural Directive)
+            ex:- In app-component.html
+	<div [ngSwitch]="value">
+	<p *ngSwitchCase="10">15/01/2022</p>
+	<p *ngSwitchCase="20">15/01/2022</p>
+	<p *ngSwitchCase="30">15/01/2022</p>
+	<p *ngSwitchCase="40">15/01/2022</p>
+	<p *ngSwitchDefault>2022</p>
+	</div>
+	In app-component.ts
+	import { Component } from '@angular/core';
+
+	@Component({
+	  selector: 'app-root',
+	  templateUrl: './app.component.html',
+	  styleUrls: ['./app.component.css']
+	})
+	export class AppComponent {
+	  value:number =20;
+	}
+
+3.Sharing data between Components(Parent,Child & Siblings)
+     Here app-component is Parent and server-element-component is Child
+      a)Parent to Child( @Input() ):
+          we can pass data from parent and we recive it by using @Input() in  child component. 
+             ex: In app-component.ts:-
+                     import { Component } from '@angular/core';
+
+	   @Component({
+	   selector: 'app-root',
+ 	   templateUrl: './app.component.html',
+	   styleUrls: ['./app.component.css']
+	  })
+	  export class AppComponent {
+	    serverElements = [ {type: 'server', name: 'Chennai', content: 'new server added'}, {type: 'server', name: 'Hyderbad', content: 'new server added'}];
+	   }
+	In app-component.html:-
+	  <app-server-element 
+		*ngFor="let serverElement of serverElements" 
+		[srvElement]="serverElement">
+	</app-server-element>
+	In server-element-component.ts(Child):-
+	  import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+
+		@Component({
+		  selector: 'app-server-element',
+  		   templateUrl: './server-element.component.html',
+  		   styleUrls: ['./server-element.component.css']
+		 })
+		export class ServerElementComponent implements OnInit {
+		  @Input('srvElement') element: {type: string, name: string, content: string};
+			 constructor() { }
+			  ngOnInit(): void { }
+		 }
+	In server-element-component.html:-
+	<div>
+                    <h1>Server Name: {{element.name}}</h1>
+                    <hr>
+                   <p>Type :- {{element.type}}</p>
+                   <p>Content :- {{element.content}}</p>
+                 </div>
+    b)Child to Parent( @Output() ):
+	The @Output() decorator in a child component or directive lets data flow from the child to the parent.
+	@Output() marks a property in a child component as a doorway through which data can travel from the child to the parent.
+
+	The child component uses the @Output() property to raise an event to notify the parent of the change. To raise an event, an @Output() must have the type of EventEmitter, which is a class in @angular/core that you use to emit custom events.
+	ex: In sever-element-component.ts:-
+		import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+
+		@Component({
+		  selector: 'app-server-element',
+ 		  templateUrl: './server-element.component.html',
+ 		  styleUrls: ['./server-element.component.css']
+		})
+		export class ServerElementComponent implements OnInit {
+ 
+ 		 @Output() baseLocDetails = new EventEmitter<any>();
+
+		  addDet(bL:string,inc:string){
+  		   console.log(bL  + " " + inc);
+    		   this.baseLocDetails.emit({bL,inc})
+                                      }
+                                     constructor() { }
+                                     ngOnInit(): void {
+                                  }
+                              }
+	In server-element-component.html
+	<div>
+    	<h1>Adding Base Location(Child Compnent-1)</h1>
+    	<hr>
+   	 <label for="base-location">Base Location: </label>
+    	<input type="text" id="base-location" #baseLocation>
+    	<label for="incharge">Incharge: </label>
+    	<input type="text" id="incharge" #incharge>
+    	<div>
+       	 <button (click)="addDet(baseLocation.value,incharge.value)">Add Details</button>
+    	</div>
+	</div>
+	In app-component.ts(Parent):-
+	import { Component } from '@angular/core';
+
+	@Component({
+  	  selector: 'app-root',
+	  templateUrl: './app.component.html',
+                    styleUrls: ['./app.component.css']
+	})
+	export class AppComponent {
+  
+	    bLocations=[];
+    	    addBLoc(data){
+    	      console.log(data);
+      	      this.bLocations.push(data);
+                        }
+                     }	
+	In app-component.html:-
+	<div>
+                    <h1>Base Location List</h1>
+                    <hr>
+                    <h5 *ngFor="let bLocation of bLocations">Location:- {{bLocation.bL}}, Incharge:- {{bLocation.inc}}</h5>
+                 </div>
+4.View Encapsulation(ShadowDom,Emulated,None):- In Angular, a component's styles can be encapsulated within the component's host element so that they don't affect the rest of the application.
+
+		   The Component's decorator provides the encapsulation option which can be used to control how the encapsulation is applied on a per component basis.
+     
+	ex: 
+		import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+
+		@Component({
+		  selector: 'app-cockpit',
+		  templateUrl: './cockpit.component.html',
+		  styleUrls: ['./cockpit.component.css'],
+		  encapsulation: ViewEncapsulation.None,
+		 })
+5.Local Refrence in Templates:
+	Template variables help you use data from one part of a template in another part of the template. Use template variables to perform tasks such as respond to user input or finely tune your application's forms.
+
+	A template variable can refer to the following:
+
+	a DOM element within a template
+	a directive
+	an element
+	TemplateRef
+	a web component
+     ex:
+        	<input #phone placeholder="phone number" />
+
+	<!-- phone refers to the input element; pass its `value` to an event handler -->
+	<button (click)="callPhone(phone.value)">Call</button>
+6.@ViewChild():- ViewChild  is used for accessing elements without using of two way binding and without passing local refrence variable to methods to accessing elements.
+           ex: In cockpit-component.html
+                <h1>cockpit works!(Child Compnent-2)</h1>
+	<p>@VeiwChild() Example</p>
+	<label for="names">Names: </label>
+	<input 
+	  type="text"
+	  id="names"
+	  #nameInputValue
+	>
+	<button (click)="addName()">Add Name</button>
+	<h1 *ngFor="let nameData of namesArr">{{nameData}}</h1>
+	In cockpit-component.ts:-
+	import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+
+	@Component({
+	  selector: 'app-cockpit',
+	  templateUrl: './cockpit.component.html',
+	  styleUrls: ['./cockpit.component.css'],
+	  encapsulation: ViewEncapsulation.None,
+	})
+	export class CockpitComponent implements OnInit {
+	   namesArr = [];
+	   @ViewChild('nameInputValue',{static:true}) nameInputValue:ElementRef;
+	  addName(){
+	    console.log(this.nameInputValue)
+	    this.namesArr.push(this.nameInputValue.nativeElement.value)
+	  }
+	  constructor() { }
+	  ngOnInit(): void { }
+	}
+	Note:- The same change (add { static: true } as a second argument) needs to be applied to ALL usages of @ViewChild() (and also @ContentChild() which you'll learn about later) IF you plan on accessing the selected element inside of ngOnInit().
+
+	If you DON'T access the selected element in ngOnInit (but anywhere else in your component), set static: false instead!
+
+	If you're using Angular 9+, you only need to add { static: true } (if needed) but not { static: false }.
+
+7.ng-content:- This topic describes how to use content projection to create flexible, reusable components.
+     ex: In cockpit-component.html
+              <ng-content></ng-content>
+          In projecting component(app-component.html)
+	<app-cockpit>
+   	 <p>Hello There hai :)</p>
+	</app-cockpit>
+
+8.Implementing Custom Directive:
+	ng g d directive-name
+      a)Implenting Custom Attribute Directive:-
+	ex:-In background-color.directive.ts
+	import { Directive, ElementRef, OnInit } from "@angular/core";
+	@Directive({
+	selector:"[backgroundColorDirective]"
+	})
+	export class BackgroundColorDirevtive implements OnInit{
+	constructor(private elementRef:ElementRef){}
+	ngOnInit(): void {
+   	 this.elementRef.nativeElement.style.backgroundColor='yellow';
+	}
+	}
+	In app.component.html
+	<p backgroundColorDirective>This is custom directive</p>
+     b)Implenting Custom Attribute Directive with renderer:-
+	Here we are using Renderer2 to for better approach
+	ex:-In app.component.html
+	<p appBetterBgColor >This is custom directive with renderer</p>
+	In better-bg-color.directive.ts
+	import { Directive,ElementRef,OnInit,Renderer2 } from '@angular/core';
+
+	@Directive({
+  	selector: '[appBetterBgColor]'
+	})
+	export class BetterBgColorDirective implements OnInit{
+
+ 	 constructor(private elRef:ElementRef,private renderer: Renderer2) { }
+	  ngOnInit(): void {
+     	 this.renderer.setStyle(this.elRef.nativeElement,'backgroundColor','green');
+ 	 }
+	}
+       c)Implenting Custom Attribute Directive using HostListener:-
+	ex:-In app.component.html
+	<p appBetterBgColor >This is custom directive with renderer</p>
+	In better-bg-color.directive.ts
+	import { Directive,ElementRef,HostListener,OnInit,Renderer2 } from '@angular/core';
+
+	@Directive({
+	  selector: '[appBetterBgColor]'
+	})
+	export class BetterBgColorDirective implements OnInit{
+ 
+	  constructor(private elRef:ElementRef,private renderer: Renderer2) { }
+	  ngOnInit(): void {}
+  	@HostListener('mouseover') mouseover(eventData:Event){
+	    this.renderer.setStyle(this.elRef.nativeElement,'backgroundColor','green');
+	  }
+	  @HostListener('mouseleave') mouseleave(eventData:Event){
+	    this.renderer.setStyle(this.elRef.nativeElement,'backgroundColor','transparent');
+	  }
+	}
+
+        d)Implenting Custom Attribute Directive using HostBinding:-
+	ex:-In app.component.html
+	<p appBetterBgColor >This is custom directive with renderer</p>
+	In better-bg-color.directive.ts
+	import { Directive,ElementRef,HostBinding,HostListener,OnInit,Renderer2 } from '@angular/core';
+
+	@Directive({
+	  selector: '[appBetterBgColor]'
+	})
+	export class BetterBgColorDirective implements OnInit{
+
+	@HostBinding('style.backgroundColor') backgroundColor: string ='transparent'
+	  constructor(private elRef:ElementRef,private renderer: Renderer2) { }
+	  ngOnInit(): void {}
+	  @HostListener('mouseover') mouseover(eventData:Event){
+	    this.backgroundColor = 'green';
+	  }
+	  @HostListener('mouseleave') mouseleave(eventData:Event){
+	   this.backgroundColor = 'transparent';
+	  }
+	}
+         e)Custom Attribute Directive Binding to Directive Properties:-
+	ex:-In app.component.html
+	<p appBetterBgColor  [defaultColour]="'transparent'" [highlightColor]="'blue'">This is custom directive with renderer</p>
+	In better-bg-color.directive.ts
+	import { Directive,ElementRef,HostBinding,HostListener,Input,OnInit,Renderer2 } from '@angular/core';
+
+	@Directive({
+	  selector: '[appBetterBgColor]'
+	})
+	export class BetterBgColorDirective implements OnInit{
+	 @Input() defaultColour: string ='transparent' // Binding to Directive Properties
+	 @Input() highlightColor: string = 'green' // Binding to Directive Properties
+	@HostBinding('style.backgroundColor') backgroundColor: string ='transparent' //HostBinding
+	  constructor(private elRef:ElementRef,private renderer: Renderer2) { }
+	  ngOnInit(): void { }
+	  @HostListener('mouseover') mouseover(eventData:Event){
+	    this.backgroundColor = this.highlightColor;// Binding to Directive Properties
+	  }
+	  @HostListener('mouseleave') mouseleave(eventData:Event){
+	  this.backgroundColor = this.defaultColour; // Binding to Directive Properties
+	  }
+	}
+        f)Implementing Custom Structral Directive
+	ex:-In app.component.html
+	<div *appUnless="flag">
+	   <p>Cutom Structral Directive</p>
+	</div>
+	In unless.directive.ts
+	import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+
+	@Directive({
+	  selector: '[appUnless]'
+	})
+	export class UnlessDirective {
+	  @Input() set appUnless(condition:boolean){
+	    if(!condition){
+	      this.vcRef.createEmbeddedView(this.templateRef);
+	    }
+	    else{
+	      this.vcRef.clear();
+	    }
+	  }
+	  constructor(private templateRef:TemplateRef<any>, private vcRef:ViewContainerRef) { }
+	}
+9.Services and Dependency Injection:   A reusable Angular service is designed to encapsulate business logic and data with different components of Angular. 
+			          It is basically a class that has a well-defined purpose to do something. 
+			          You can create a service class for data or logic that is not associated with any specific view to share across components.
+	ex:-In logging.service.ts
+		export class LoggingService{
+  		  logDetails(details:string){
+ 		       console.log('These is'+ " " +details);
+		    }
+		}
+	Before using the service we need to declare that in providers array in app.module.ts as below:
+	     In app.module.ts:
+		import { BrowserModule } from '@angular/platform-browser';
+		import { NgModule } from '@angular/core';
+		import { FormsModule } from '@angular/forms'; 
+
+		import { AppRoutingModule } from './app-routing.module';
+		import { AppComponent } from './app.component';
+		import { LoggingService } from "./services/logging.service";
+
+		@NgModule({
+		  declarations: [
+		    AppComponent
+		  ],
+		  imports: [
+		    BrowserModule,
+		    AppRoutingModule,
+		    FormsModule
+		  ],
+		  providers: [LoggingService],
+		  bootstrap: [AppComponent]
+		})
+		export class AppModule { }
+		Note:- If we declare our service here the same instance is provided for the whole app. Or else we can provide it in individual component(In metadata of component by using providers array) were it is required but the instane created in the
+			parent component is overrided by child component so it is not best apporach.
+	     In app.component.ts:
+		i.First we need import the service that we want use in our compnent.
+		ii.Then we need create instance of service which we are importing by injecting into the constructor as below.
+		iii.Then we can access the methods or data in service as below in addBLoc method.
+		import { Component } from '@angular/core';
+		import { LoggingService } from "./services/logging.service";
+
+		@Component({
+		  selector: 'app-root',
+		  templateUrl: './app.component.html',
+		  styleUrls: ['./app.component.css']
+		})
+		export class AppComponent {
+		  constructor(private logService:LoggingService){} 
+		    bLocations=[];   
+		    addBLoc(data){
+		      this.logService.logDetails(data);
+		      this.bLocations.push(data);
+		  }
+		}
+
+  
+	Injecting service into service
+	It is same as injecting service into component but one different thing is we need to add @Injectable() in service where we need to inject other service.
+		ex:-In logging.service.ts
+			export class LoggingService{
+			    logDetails(details:string){
+			        console.log('These is'+ " " +details);
+			    }
+			}	
+		      In add.service.ts
+			import { Injectable } from "@angular/core";
+			import { LoggingService } from "./logging.service";
+			@Injectable()
+			export class AddService{
+			    constructor(private logService:LoggingService){}
+			    add(a:number,b:number){
+			        this.logService.logDetails(typeof(a));
+			        return Number(a) + Number(b);
+			    }
+			}
+	Cross component communication Using Services:- Refer 113 vedio.
+10.Routing:-
+	First we need to create appRoutes array of type " Routes" which hold the information about our routes,
+	and need to import the "RouterModule" in imports array and then we need include router-outlet tags in component,
+	 implement as below.
+        ex:-import { BrowserModule } from '@angular/platform-browser';
+	import { NgModule } from '@angular/core';
+	import { FormsModule } from '@angular/forms';
+
+	import { AppComponent } from './app.component';
+	import { HomeComponent } from './home/home.component';
+	import { UsersComponent } from './users/users.component';
+	import { ServersComponent } from './servers/servers.component';
+	import { UserComponent } from './users/user/user.component';
+	import { EditServerComponent } from './servers/edit-server/edit-server.component';
+	import { ServerComponent } from './servers/server/server.component';
+	import { ServersService } from './servers/servers.service';
+	import { Routes, RouterModule } from '@angular/router';
+
+	const appRoutes: Routes =[
+  	{path:'',component:HomeComponent},
+  	{path:'users',component:UsersComponent},
+  	{path:'servers',component:ServersComponent}
+	]
+	@NgModule({
+  	declarations: [
+    	AppComponent,
+    	HomeComponent,
+    	UsersComponent,
+    	ServersComponent,
+    	UserComponent,
+    	EditServerComponent,
+    	ServerComponent
+  	],
+  	imports: [
+    	BrowserModule,
+  	FormsModule,
+    	RouterModule.forRoot(appRoutes)
+  	],
+  	providers: [ServersService],
+  	bootstrap: [AppComponent]
+	})
+	export class AppModule { }
+	In app.compnent.html:
+	<div class="container">
+  	<div class="row">
+   	 <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+     	 <ul class="nav nav-tabs">
+      	  <li role="presentation" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}"><a routerLink="/">Home</a></li>
+       	 <li role="presentation" routerLinkActive="active"><a routerLink="servers">Servers</a></li>
+       	 <li role="presentation" routerLinkActive="active"><a [routerLink]="['users']">Users</a></li>
+	</ul>
+    	</div>
+	  </div>
+	  <div class="row">
+	    <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+	     <router-outlet></router-outlet>
+	    </div>
+	  </div>
+	</div>
+	Note:- By usimg routerLink we can navigate through different components,
+	[routerLinkActiveOptions]="{exact:true}" is for navigating to exact component.
+	We can activate style by using routerLinkActive="active" instead of active in double quotes
+	we use our class which need to be use there.
+	a)We can also navigate between components by programnatically see below example:
+		ex:In home.component.html
+			<button class="btn btn-primary"(click)="onLoadServer()">Load Server</button>
+		     In home.component.ts
+			import { Component, OnInit } from '@angular/core';
+			import { Router } from '@angular/router';
+
+			@Component({
+			  selector: 'app-home',
+			  templateUrl: './home.component.html',
+			  styleUrls: ['./home.component.css']
+			})
+			export class HomeComponent implements OnInit {
+
+			  constructor(private router: Router) { }
+
+			  ngOnInit() {
+			  }
+ 			 onLoadServer(){
+			    this.router.navigate(['/servers'])
+			  }
+			}
+	Note:-  navigate() method don't hold information about were it is currently in to that we use ActivatedRoute.
+		      ex:-In servers.component.html
+			 <button class="btn btn-primary" (click)="onReload()">Reload Page</button>
+		            In servers.component.ts
+			import { Component, OnInit } from '@angular/core';
+			import { ActivatedRoute, Router } from '@angular/router';
+			import { ServersService } from './servers.service';
+
+			@Component({
+			  selector: 'app-servers',
+			  templateUrl: './servers.component.html',
+			  styleUrls: ['./servers.component.css']
+			})
+			export class ServersComponent implements OnInit {
+			  public servers: {id: number, name: string, status: string}[] = [];
+
+			  constructor(private serversService: ServersService,private router: Router,private route:ActivatedRoute) { }
+
+			  ngOnInit() {
+			    this.servers = this.serversService.getServers();
+			  }
+ 			 onReload(){
+			     this.router.navigate(['/servers'], {relativeTo:this.route})
+			  }
+			}
+	b)Passing Parameters:
+		ex:In App.module.ts:
+			const appRoutes: Routes =[
+			  { path:'users/:id/:name', component: UserComponent }
+			]
+	
+	c)Fetching Route Parameters:
+		we can fetch using snapshot & params
+		ex:In user.component.html
+			<p>User with ID {{user.id}} loaded.</p>
+			<p>User name is {{user.name}}</p>
+		    In user.component.ts
+			import { Component, OnInit } from '@angular/core';
+			import { ActivatedRoute, Params } from '@angular/router';
+
+			@Component({
+			  selector: 'app-user',
+			  templateUrl: './user.component.html',
+			  styleUrls: ['./user.component.css']
+			})
+			export class UserComponent implements OnInit {
+			  user: {id: number, name: string};
+
+			  constructor(private route:ActivatedRoute) { }
+
+			  ngOnInit() {
+			    this.user ={
+			      id:this.route.snapshot.params['id'],
+			      name:this.route.snapshot.params['name']
+			    }
+			  }
+			}
+	c)Fetching Route Parameters Reactively
+		ex:In user.component.html
+			<p>User with ID {{user.id}} loaded.</p>
+			<p>User name is {{user.name}}</p>
+			<button class="btn btn-primary" [routerLink]="['/users',3,'ALEX']">Load Alex</button>
+ 		   In User.componet.ts
+			import { Component, OnInit } from '@angular/core';
+			import { ActivatedRoute, Params } from '@angular/router';
+
+			@Component({
+			  selector: 'app-user',
+			  templateUrl: './user.component.html',
+			  styleUrls: ['./user.component.css']
+			})
+			export class UserComponent implements OnInit {
+			  user: {id: number, name: string};
+
+			  constructor(private route:ActivatedRoute) { }
+
+			  ngOnInit() {
+			    this.user ={
+			      id:this.route.snapshot.params['id'],
+			      name:this.route.snapshot.params['name']
+			    }
+			    this.route.params.subscribe(
+			      (params: Params)=>{
+			        this.user.id = params['id'];
+			        this.user.name = params['name'];
+			      }
+			    )
+			  }
+			}
+	Note: -Here we are using subscribe method to get data because while using snapshot it will holds the data once component is loaded and if we pass new data it willl not updated because again component is not reintanate the component.
+
+	Cleaning up subscroption manually:
+	Actually angular will do cance the subscriptions automatically while destroying component, this is for our understanding.
+		ex: In user.component.ts
+			import { Component, OnDestroy, OnInit } from '@angular/core';
+			import { ActivatedRoute, Params } from '@angular/router';
+			import { Subscription } from 'rxjs';
+
+			@Component({
+			  selector: 'app-user',
+			  templateUrl: './user.component.html',
+			  styleUrls: ['./user.component.css']
+			})
+			export class UserComponent implements OnInit,OnDestroy {
+			  user: {id: number, name: string};
+			  paramsSubscription: Subscription;
+			  constructor(private route:ActivatedRoute) { }
+
+			  ngOnInit() {
+			    this.user ={
+			      id:this.route.snapshot.params['id'],
+			      name:this.route.snapshot.params['name']
+			    }
+			    this.paramsSubscription = this.route.params.subscribe(
+			      (params: Params)=>{
+			        this.user.id = params['id'];
+			        this.user.name = params['name'];
+			      }
+			    )
+			  }
+			  ngOnDestroy(): void {
+			      this.paramsSubscription.unsubscribe();
+			  }
+			}
+
+	d)Passing QueryParams & fragments:
+		ex: In app.module.ts
+			const appRoutes: Routes =[
+		  	{path:'servers/:id/edit', component: EditServerComponent}
+			]
+		In servers.component.html
+			 <a
+			        [routerLink]="['/servers', 5,'edit']"
+			        [queryParams]="{allowEdit: '1'}"
+			        fragment="loading"
+			        href="#"
+			        class="list-group-item"
+			        *ngFor="let server of servers">
+			        {{ server.name }}
+			 </a>
+	Now we can achive this by programmatically by follwing way
+		ex:In home.component.html
+		button class="btn btn-primary"(click)="onLoadServer(1)">Load Server 1</button>
+		In home.component.ts
+		import { Component, OnInit } from '@angular/core';
+		import { Router } from '@angular/router';
+
+		@Component({
+		  selector: 'app-home',
+		  templateUrl: './home.component.html',
+		  styleUrls: ['./home.component.css']
+		})
+		export class HomeComponent implements OnInit {
+
+		  constructor(private router: Router) { }
+
+		  ngOnInit() {
+		  }
+		  onLoadServer(id:number){
+		    this.router.navigate(['/servers', 5, 'edit'], {queryParams:{allowEdit:'1'}, fragment:'loading'})
+		  }
+		}
+	e)Retriving queryParams & fragments:
+		ex: In edit-server.component.ts
+		 ngOnInit() {
+		    console.log(this.route.snapshot.queryParams);
+		    console.log(this.route.snapshot.fragment);
+		    this.route.queryParamMap.subscribe();
+		    this.route.fragment.subscribe();		    
+ 		 }
+	f)Child(Nested) Routes:
+	ex: In app.module.ts
+		const appRoutes: Routes =[
+		  {path:'', component: HomeComponent},
+		  {path:'users', component: UsersComponent, children:[
+		    {path:':id/:name', component: UserComponent}
+		  ]},
+		  {path:'servers', component: ServersComponent, children:[
+		    {path:':id', component: ServerComponent},
+		    {path:':id/edit', component: EditServerComponent}
+		  ]}
+		]
+	In users.component.html
+	<div class="col-xs-12 col-sm-4">
+	    <router-outlet></router-outlet>
+	  </div>
+	In servers.component.html
+	<div class="col-xs-12 col-sm-4">
+	    <router-outlet></router-outlet> 
+	  </div>
+	g)queryParamsHandling:-In Angular, query parameters are lost when we navigate from one route to another route, without loosing query parameters we can achive them by using " quaryParamsHandling : 'preserve' ".
+		ex: In server.component.html
+			<button class="btn btn-primary" (click)="onEdit()">Edit</button>
+		     In server.component.ts
+			onEdit(){
+			    this.router.navigate(['edit'], { relativeTo:this.route, queryParamsHandling:'preserve' })
+			  }
+	h)WildCard Routes:
+		ex:- In app.module.ts
+			const appRoutes: Routes =[
+			  { path:'', component: HomeComponent },
+			  { path:'users', component: UsersComponent, children:[
+			    { path:':id/:name', component: UserComponent }
+			  ]},
+			  { path:'servers', component: ServersComponent, children:[
+			    { path:':id', component: ServerComponent },
+			    { path:':id/edit', component: EditServerComponent }
+			  ]},
+			  { path:'not-found', component:PageNotFoundComponent },
+			  { path:'**', redirectTo:'/not-found' }
+			]
+	i)keeping the routes configuration in seperate module.
+		ex:- In app.module.ts
+			import { BrowserModule } from '@angular/platform-browser';
+			import { NgModule } from '@angular/core';
+			import { FormsModule } from '@angular/forms';
+
+			import { ServersService } from './servers/servers.service';
+
+			import { AppComponent } from './app.component';
+			import { HomeComponent } from './home/home.component';
+			import { UsersComponent } from './users/users.component';
+			import { ServersComponent } from './servers/servers.component';
+			import { UserComponent } from './users/user/user.component';
+			import { EditServerComponent } from './servers/edit-server/edit-server.component';
+			import { ServerComponent } from './servers/server/server.component';
+			import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+			import { AppRoutingModule } from "./app-routing.module";
+
+			@NgModule({
+			  declarations: [
+			    AppComponent,
+			    HomeComponent,
+			    UsersComponent,
+			    ServersComponent,
+			    UserComponent,
+			    EditServerComponent,
+			    ServerComponent,
+			    PageNotFoundComponent
+			  ],
+			  imports: [
+			    BrowserModule,
+			    FormsModule,
+			    AppRoutingModule
+			  ],
+			  providers: [ServersService],
+			  bootstrap: [AppComponent]
+			})
+			export class AppModule { }
+	 	In new routing module(app-routing.module.ts)
+			import { NgModule } from "@angular/core";
+			import { Routes, RouterModule, Router } from '@angular/router';
+
+			import { HomeComponent } from './home/home.component';
+			import { UsersComponent } from './users/users.component';
+			import { ServersComponent } from './servers/servers.component';
+			import { UserComponent } from './users/user/user.component';
+			import { EditServerComponent } from './servers/edit-server/edit-server.component';
+			import { ServerComponent } from './servers/server/server.component';
+			import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+
+			const appRoutes: Routes =[
+			    { path:'', component: HomeComponent, pathMatch: 'full' },
+			    { path:'users', component: UsersComponent, children:[
+			      { path:':id/:name', component: UserComponent }
+			    ]},
+			    { path:'servers', component: ServersComponent, children:[
+			      { path:':id', component: ServerComponent },
+			      { path:':id/edit', component: EditServerComponent }
+			    ]},
+			    { path:'not-found', component:PageNotFoundComponent },
+			    { path:'**', redirectTo:'/not-found' }
+			  ]
+			@NgModule({
+			imports:[
+			    RouterModule.forRoot(appRoutes)
+			],
+			exports:[RouterModule]
+			})
+			export class AppRoutingModule{
+
+			}
+11)Forms:
+	Template Driven Forms:
+		a)Creating form, registering controls and submittimg using the form: 	
+			i. while registering controls we append ngModel & name to particular control.
+			ii.for submitting the form we use "ngSubmit" method and template refrence variable with "ngForm" to access form values.
+
+		ex:- In app.component.html
+			<div class="container">
+			  <div class="row">
+			    <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+			      <form (ngSubmit)="onSubmit(f)" #f="ngForm">
+			        <div id="user-data">
+			          <div class="form-group">
+			            <label for="username">Username</label>
+			            <input 
+			            type="text" 
+			            id="username" 
+			            class="form-control"
+			            ngModel
+			            name="username"
+			            >
+			          </div>
+			          <button class="btn btn-default" type="button">Suggest an Username</button>
+			          <div class="form-group">
+			            <label for="email">Mail</label>
+			            <input 
+			            type="email" 
+			            id="email" 
+			            class="form-control"
+			            ngModel
+			            name="email"
+			            >
+			          </div>
+			        </div>
+			        <div class="form-group">
+			          <label for="secret">Secret Questions</label>
+			          <select 
+			          id="secret" 
+			          class="form-control"
+			          ngModel
+			          name="secret"
+			          >
+			            <option value="pet">Your first Pet?</option>
+			            <option value="teacher">Your first teacher?</option>
+			          </select>
+			        </div>
+			        <button class="btn btn-primary" type="submit">Submit</button>
+			      </form>
+			    </div>
+			  </div>
+			</div>
+			In app.component.ts:-
+			import { Component } from '@angular/core';
+			import { NgForm } from '@angular/forms';
+
+			@Component({
+			  selector: 'app-root',
+			  templateUrl: './app.component.html',
+			  styleUrls: ['./app.component.css']
+			})
+			export class AppComponent {			 
+			  suggestUserName() {
+			    const suggestedName = 'Superuser';
+			  }
+			  onSubmit(form:NgForm){
+			    console.log(form);
+			     console.log(form.value.username +''+form.value.email +''+form.value.secret);
+			   }
+			}
+
+	b)we can also access form values by using @ViewChild
+		ex:- In app.component.html:-
+			 <form (ngSubmit)="onSubmit()" #f="ngForm"></form>
+		       In app.component.ts:-
+			import { Component, ViewChild } from '@angular/core';
+			import { NgForm } from '@angular/forms';
+
+			@Component({
+			  selector: 'app-root',
+			  templateUrl: './app.component.html',
+			  styleUrls: ['./app.component.css']
+			})
+			export class AppComponent {
+			  @ViewChild('f') inputFormValues:NgForm;
+			  suggestUserName() {
+			    const suggestedName = 'Superuser';
+			  }
+			  onSubmit(){
+			    console.log(this.inputFormValues);
+			  }
+			}
+
+              c)adding validations to user input (using required)
+	ex:- In app.component.html
+		 <form (ngSubmit)="onSubmit()" #f="ngForm">
+		        <div id="user-data">
+		          <div class="form-group">
+		            <label for="username">Username</label>
+			            <input 
+			            type="text" 
+			            id="username" 
+			            class="form-control"
+			            ngModel
+			            name="username"
+			            required
+			            >
+		          </div>
+		</form>
+              d)using f0rm state to display error and disabling buttons(ng-touched,ng-invalid)
+	ex:- In app.component.html
+		<form (ngSubmit)="omSubmit()" #f="ngForm">
+		<button 
+		        class="btn btn-primary" 
+		        type="submit"
+		        [disabled]="!f.valid"
+		        >
+		        Submit</button>
+		</form>
+	    In app.component.css:-
+		input.ng-invalid.ng-touched,select.ng-invalid.ng-touched{
+		    border: 2px solid red;
+		  }
+         e)displaying error message :- Here we are using  template refrence vaiable(#username="ngModel") to get values of control to validate in span tag.
+	ex:- In app.component.html
+	  <div class="form-group">
+	            <label for="username">Username</label>
+	            <input 
+	            type="text" 
+	            id="username" 
+	            class="form-control"
+	            ngModel
+	            name="username"
+	            required
+	            #username="ngModel"
+	            >
+	            <span class="help-block" *ngIf="!username.valid && username.touched">please enter valid username!</span>
+	          </div>
+      f)Seting default values by using ngModel property bindings
+	ex: In app.component.html
+		 userName = 'Surya Teja G';
+	     In app.component.html:-
+		<div class="form-group">
+		            <label for="username">Username</label>
+		            <input 
+		            type="text" 
+		            id="username" 
+		            class="form-control"
+		            [ngModel]="userName"
+		            name="username"
+		            required
+		            #username="ngModel"
+		            >
+		            <span class="help-block" *ngIf="!username.valid && username.touched">please enter valid username!</span>
+		          </div>
+       g)ngModel using two way binding
+	ex:- In app.component.ts
+		answer=''
+	      In app.component.html
+		 <div class="form-group">
+		          <textarea
+		          name="QnA"
+		          row="3"
+		          class="form-control"
+		          [(ngModel)]="answer"
+		          >
+		          </textarea>
+		          <p>your reply:-{{answer}}</p>
+	                  </div>
+      h)Grouping form controls using ngModelGroup
+	ex:- in app.component.html
+	<div 
+	        id="user-data"
+	        ngModelGroup = "userData"
+	        #userData = "ngModelGroup"
+	        >       
+	</div>
+	        <p *ngIf="!userData.valid && userData.touched">Please enter valid user data</p>
+      i)Handling Radio buttons
+	ex:- In app.component.html
+		<div class="radio" *ngFor="let gender of genders">
+		            <label >
+		            <input
+		            type="radio"
+		            name="gender"
+		            ngModel
+		            [value]="gender"
+		            >
+		          {{gender}}
+		          </label>
+		          </div>
+		        </div>
+	     In app.component.ts
+		genders =['male', 'female']
+      j)Setting and patching form values:
+	ex:- In app.component.html
+		 <button 
+		          class="btn btn-default" 
+		          type="button"
+		          (click)=" suggestUserName()"
+		          >Suggest an Username</button>
+	     In app.component.ts:-
+		@ViewChild('f') inputFormValues:NgForm;
+		  suggestUserName() {
+		    const suggestedName = 'Superuser';
+		    this.inputFormValues.setValue(
+		      {
+		        userData:{
+		          username: 'Harry',
+		          email: suggestedName
+		        },
+		        secret:'pet',
+		        QnA:'GSD',
+		        gender:'male'
+		      }
+		    )
+		  }
+	Patching value:-
+	In app.component.ts
+		suggestUserName() {
+		    const suggestedName = 'Superuser';
+		    this.inputFormValues.form.patchValue(
+		      {
+		        userData:{
+		          username:suggestedName
+		        }
+		      }
+		    )
+		  }
+        k)Using form Data
+	ex:- In app.component.html
+		 <hr>
+		  <div class="row" *ngIf="submited">
+		    <div class="col-xs-12">
+		      <h3>Your Data</h3>
+		      <p>User Name: {{user.name}}</p>
+		      <p>Email: {{user.email}}</p>
+		      <p>Secret Question: {{user.cq}}</p>
+		      <p>Answer: {{user.answer}}</p>
+		      <p>Gender: {{user.gender}}</p>
+		    </div>
+		  </div>
+	  In app.component.ts:-
+		submited = false;
+	                  user={ name:'', email:'', cq:'', answer:'', gender:''}
+		  onSubmit(){
+		    console.log(this.inputFormValues);
+		    this.user.name = this.inputFormValues.value.userData.username;
+		    this.user.email = this.inputFormValues.value.userData.email;
+		    this.user.cq = this.inputFormValues.value.secret;
+		    this.user.answer = this.inputFormValues.value.QnA;
+		    this.user.gender = this.inputFormValues.value.gender;
+		    this.submited = true;
+		  }
+       l)Resetting form Data
+	ex:- in app.component.ts
+		 onSubmit(){
+		    console.log(this.inputFormValues);
+		    this.user.name = this.inputFormValues.value.userData.username;
+		    this.user.email = this.inputFormValues.value.userData.email;
+		    this.user.cq = this.inputFormValues.value.secret;
+		    this.user.answer = this.inputFormValues.value.QnA;
+		    this.user.gender = this.inputFormValues.value.gender;
+		    this.submited = true;
+		    this.inputFormValues.reset();
+		  }
+	Reactive Forms:
+		a)Creating form in code :- Here we are importing ReactiveFormsModule.
+			i.here we create signupForm of type FormGroup.
+			ii.we create a new formGroup and registering new form controls in ngOnInit.
+			ex:- In app.module.ts:-
+				import { ReactiveFormsModule } from '@angular/forms';
+				imports: [
+				        ReactiveFormsModule
+				  ]
+			In app.component.ts:-
+			import { Component, OnInit } from '@angular/core';
+			import { FormControl, FormGroup } from '@angular/forms';
+
+			@Component({
+			  selector: 'app-root',
+			  templateUrl: './app.component.html',
+			  styleUrls: ['./app.component.css']
+			})
+			export class AppComponent implements OnInit{
+			  genders = ['male', 'female'];
+			  signupForm:FormGroup;
+			ngOnInit(): void {
+			    this.signupForm = new FormGroup({      
+			        'username': new FormControl(null),
+			        'email': new FormControl(null),    
+			      'gender': new FormControl('male')
+			    })
+			}
+			}
+		b)Syncing up html and ts code
+			ex:- In app.component.html:- 
+				i.here we sync html & ts using formGroup by binding our property to it "signupForm" in form tag. ex: [formGroup]="signupForm"
+				ii.and we use formControlName to sync with particular input element ex:  formControlName="username"
+				<div class="container">
+				  <div class="row">
+				    <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+				      <form [formGroup]="signupForm" >    
+				          <div class="form-group">
+				            <label for="username">Username</label>
+				            <input
+				              type="text"
+				              id="username"
+				              formControlName="username"
+				              class="form-control">
+				          </div>
+				          <div class="form-group">
+				            <label for="email">email</label>
+				            <input
+				              type="text"
+				              id="email"
+				              formControlName="email"
+				              class="form-control">
+				          </div>          
+				        <div class="radio" *ngFor="let gender of genders">
+				          <label>
+ 				           <input
+				            formControlName="gender"
+				              type="radio"
+				              [value]="gender">{{ gender }}
+				          </label>
+				        </div>
+				        <button class="btn btn-primary" type="submit">Submit</button>
+				      </form>
+				    </div>
+				  </div>
+				</div>
+		c)Submitting form and adding validations to form
+			i.here in this approach we use (ngSubmit) same as template driven approach but we dont use template refrence method
+			ii.here we add validators in ts file in individual formcontrol 1st parameter is value, 2nd parameter is validator array we can add number of validations
+			ex:- In app.component.ts:-
+				import { Component, OnInit } from '@angular/core';
+				import { FormControl, FormGroup, Validators } from '@angular/forms';
+
+				@Component({
+				  selector: 'app-root',
+				  templateUrl: './app.component.html',
+				  styleUrls: ['./app.component.css']
+				})
+				export class AppComponent implements OnInit{
+				  genders = ['male', 'female'];
+				  signupForm:FormGroup;
+				ngOnInit(): void {
+				    this.signupForm = new FormGroup({     
+				        'username': new FormControl(null, Validators.required),
+				        'email': new FormControl(null,[Validators.required,Validators.email]),
+				        'gender': new FormControl('male'),
+				    })
+				}
+				onSubmit(){
+				  console.log(this.signupForm);
+				}
+			}
+			 In app.component.html:-
+				<div class="container">
+				  <div class="row">
+				    <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+				      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+				          <div class="form-group">
+				            <label for="username">Username</label>
+				            <input
+				              type="text"
+				              id="username"
+				              formControlName="username"
+				              class="form-control">
+				          </div>
+				          <div class="form-group">
+				            <label for="email">email</label>
+				            <input
+				              type="text"
+				              id="email"
+				              formControlName="email"
+				              class="form-control">
+				          </div>     
+				        <div class="radio" *ngFor="let gender of genders">
+				          <label>
+				            <input
+				            formControlName="gender"
+				              type="radio"
+				              [value]="gender">{{ gender }}
+				          </label>
+				        </div>
+				        <button class="btn btn-primary" type="submit">Submit</button>
+				      </form>
+				    </div>
+				  </div>
+				</div>
+
+		d)Getting access to controls & Grouping controls:-
+			ex: In app.component.ts:-
+				import { Component, OnInit } from '@angular/core';
+				import { FormControl, FormGroup, Validators } from '@angular/forms';
+
+				@Component({
+				  selector: 'app-root',
+				  templateUrl: './app.component.html',
+				  styleUrls: ['./app.component.css']
+				})
+				export class AppComponent implements OnInit{
+				  genders = ['male', 'female'];
+				  signupForm:FormGroup;
+				ngOnInit(): void {
+				    this.signupForm = new FormGroup({
+				      'userData': new FormGroup({
+				        'username': new FormControl(null, Validators.required),
+				        'email': new FormControl(null,[Validators.required,Validators.email])
+				      }),
+				      'gender': new FormControl('male')
+				    })
+				}
+			onSubmit(){
+			  console.log(this.signupForm);
+			}
+		}
+			In app.component.html:-
+				<div class="container">
+				  <div class="row">
+				    <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+				      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+				        <div formGroupName="userData">
+				          <div class="form-group">
+				            <label for="username">Username</label>
+				            <input
+                                                                                     type="text"
+				              id="username"
+				              formControlName="username"
+				              class="form-control">
+				              <span
+				              class="help-block"
+				              *ngIf="!signupForm.get('userData.username').valid && signupForm.get('userData.username').touched"
+				              >Please enter valid UserName</span>
+				          </div>
+				          <div class="form-group">
+				            <label for="email">email</label>
+				            <input
+				              type="text"
+				              id="email"
+				              formControlName="email"
+				              class="form-control">
+				              <span
+				              class="help-block"
+				              *ngIf="!signupForm.get('userData.email').valid && signupForm.get('userData.email').touched"
+				              >Please enter valid Mail</span>
+				          </div>
+				        </div>   
+				        <div class="radio" *ngFor="let gender of genders">
+				          <label>
+				            <input
+				            formControlName="gender"
+				              type="radio"
+				              [value]="gender">{{ gender }}
+				          </label>
+				        </div>
+				        <span
+				        class="help-block"
+				              *ngIf="!signupForm.valid && signupForm.touched"
+				              >Please enter valid data</span>
+				        <button class="btn btn-primary" type="submit">Submit</button>
+				      </form>
+				    </div>
+				  </div>
+				</div>
+
+		e)FormArray:
+			ex:- In app.component.html
+				 <div formArrayName="hobbies">
+				          <h4>you hobbies</h4>
+				          <button
+				          (click)="onAddHobby()"
+				           class="btn btn-default">
+				              Add Hobby
+				          </button>
+				          <div 
+				          class="form-group"
+				          *ngFor="let hobbyControl of controls; let i = index">
+				          <input
+				           type="text" 
+				          class="form-control"
+				          [formControlName]="i">
+				          </div>
+				        </div>
+			In app.component.ts:-
+				import { Component, OnInit } from '@angular/core';
+				import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+
+				@Component({
+					  selector: 'app-root',
+					  templateUrl: './app.component.html',
+					  styleUrls: ['./app.component.css']
+				})
+				export class AppComponent implements OnInit{
+				  genders = ['male', 'female'];
+				  signupForm:FormGroup;
+				ngOnInit(): void {
+				    this.signupForm = new FormGroup({
+				      'userData': new FormGroup({
+				        'username': new FormControl(null, Validators.required),
+				        'email': new FormControl(null,[Validators.required,Validators.email])
+				      }),
+				      'gender': new FormControl('male'),
+				      'hobbies': new FormArray([])
+				    })
+				}
+				onSubmit(){
+				  console.log(this.signupForm);
+				}
+
+				onAddHobby(){
+				  const control = new FormControl(null,Validators.required);
+				  return (<FormArray>this.signupForm.get('hobbies')).push(control);
+				}
+				}
+	f)Creating custom validators & using error codes:-
+		ex:- In app.component.html:-
+			<div formGroupName="userData">
+			          <div class="form-group">
+			            <label for="username">Username</label>
+			            <input
+			              type="text"
+			              id="username"
+			              formControlName="username"
+			              class="form-control">
+			              <span
+			              class="help-block"
+			              *ngIf="!signupForm.get('userData.username').valid && signupForm.get('userData.username').touched"
+			              >
+			              <span 
+			              *ngIf="signupForm.get('userData.username').errors['nameIsForbidden']">
+			              This name is forbidden
+			              </span>
+			              <span 
+			              *ngIf="signupForm.get('userData.username').errors['required']">
+			              This field is required
+			              </span>
+			              </span>
+			          </div>
+			</div>
+		In app.component.ts:-
+			 forbiddenUserNames=['chris','anna'];
+				ngOnInit(): void {
+				    this.signupForm = new FormGroup({
+				      'userData': new FormGroup({
+				        'username': new FormControl(null, [Validators.required, this.forbiddenNames.bind(this)])
+				      })
+				    })
+				}
+			forbiddenNames(control: FormArray): {[s:string]: boolean}{
+			  if(this.forbiddenUserNames.indexOf(control.value) !== -1){
+			    return {'nameIsForbidden': true}
+			  }
+			 return null;
+			}
+		g)Async validators:
+			ex: In app.component.ts:-
+				ngOnInit(): void {
+				    this.signupForm = new FormGroup({
+				      'userData': new FormGroup({
+				        'username': new FormControl(null, [Validators.required, this.forbiddenNames.bind(this)], this.forbiddenEmails)
+				      })
+				    })
+				}
+			
+			forbiddenEmails(control: FormControl): Promise<any> | Observable<any> {
+				const promise =new Promise<any>((resolve,reject)=>{
+				  setTimeout(()=>{
+				    if(control.value === 'test@test.com'){
+				      resolve({'emailIsForbidden':true})
+				    }
+				    else{
+				      resolve(null)
+				    }
+				  },1500)
+				})
+				return promise;
+				}
+		h)Status changes or Value changes:
+			ex:- In app.component.ts:-
+				ngOnInit(){
+					 this.signupForm = new FormGroup({
+				      'userData': new FormGroup({
+				        'username': new FormControl(null, [Validators.required, this.forbiddenNames.bind(this)], this.forbiddenEmails)
+				      })
+				    })
+				 this.signupForm.valueChanges.subscribe(
+				      (value) => console.log(value)
+				    )
+				    this.signupForm.statusChanges.subscribe(
+				      (status) => console.log(status)
+				    )
+				}
+		i)Setting & Patching values & resetting form: These behave same as in template driven approach
+			ex:- In app.component.ts:-
+				ngOnInit(): void {
+				    this.signupForm = new FormGroup({
+				      'userData': new FormGroup({
+				        'username': new FormControl(null, [Validators.required, this.forbiddenNames.bind(this)]),
+				        'email': new FormControl(null,[Validators.required,Validators.email], this.forbiddenEmails)
+				      }),
+				      'gender': new FormControl('male'),
+				      'hobbies': new FormArray([])
+				    })
+
+				    this.signupForm.setValue(
+				      {
+				        'userData':{
+				          'username': 'surya',
+				          'email': 'suryateja@hotmail.com'
+				        },
+				        'gender':'male',
+				        'hobbies': []
+				      }
+				    )
+				    this.signupForm.patchValue(
+				      {
+				        'userData':{
+				          'username': 'Surya Teja',
+				      }
+				    }
+				  )
+				}
+			onSubmit(){
+			  console.log(this.signupForm);
+			  this.signupForm.reset();
+			}
+12)Pipes:- Transforming values
+	a)Builtin Pipes:- In app.component.html
+		ex:-
+		<li> <strong>{{ server.name }}</strong> | {{ server.instanceType | uppercase }} | {{ server.started | date:"MM/dd/yy"}} </li>
+		<li>{{ amount | currency:'EUR' }} </li>
+		ex:- slice pipe
+			@Component({
+			  selector: 'slice-list-pipe',
+			  template: `<ul>
+			    <li *ngFor="let i of collection | slice:1:3">{{i}}</li>
+			  </ul>`
+			})
+			export class SlicePipeListComponent {
+			  collection: string[] = ['a', 'b', 'c', 'd'];
+			}
+		produces the following:
+		<li>b</li>
+		<li>c</li>
+	Chaining Multiple Pipes: Here it will happen from left to right and here order is important while using pipes.
+				ex:- In app.component.html
+					<li>{{ server.started | date:'fullDate' | lowercase}}</li>
+	b)Custom Pipes:- 
+		ex:- In app.component.html
+			<li> <strong>{{ server.name | shorten}}</strong></li>
+		       In shorten.pipe.ts:-
+			import { Pipe,PipeTransform } from "@angular/core"
+
+
+			@Pipe({
+			    name: 'shorten'
+			})
+			export class ShortenPipe implements PipeTransform{
+			    transform(value:any){
+			        if(value.length > 10){
+			            return value.substr(0,10) + ' ...';
+			        }
+			        return value;
+			    }
+			}
+		  In app.module.ts:-
+			import { ShortenPipe } from "./shorten.pipe";
+			
+			@NgModule({
+			  declarations: [
+			    AppComponent,
+			    ShortenPipe
+			  ],
+      			})
+	Parameterizing custom Pipe:
+		ex:  In shorten.pipe.ts:-
+			import { Pipe,PipeTransform } from "@angular/core"
+
+
+			@Pipe({
+			    name: 'shorten'
+			})
+			export class ShortenPipe implements PipeTransform{
+			    transform(value:any, limit  number){
+			        if(value.length > 10){
+			            return value.substr(0, limit) + ' ...';
+			        }
+			        return value;
+			    }
+			}
+		 I app.component.html:-
+			<li> <strong>{{ server.name | shorten: 10}}</strong></li>
+	General ex:- In app.component.html:-
+		<div class="container">
+		 <div class="row">
+		    <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+		      <input type="text" [(ngModel)]="filteredStatus">
+		      <hr>
+		      <ul class="list-group">
+		        <li
+		          class="list-group-item"
+		          *ngFor="let server of servers | filter:filteredStatus:'status'"
+		          [ngClass]="getStatusClasses(server)">
+		          <span
+		            class="badge">
+		            {{ server.status }}
+		          </span>
+		          <strong>{{ server.name | shorten:10}}</strong> | 
+		          {{ server.instanceType | uppercase }} | 
+		          {{ server.started | date:'fullDate' | lowercase}}
+		        </li>
+		      </ul>
+		    </div>
+		  </div>
+		</div>
+		In filter.pipe.ts:-		
+			import { Pipe, PipeTransform } from '@angular/core';
+
+			@Pipe({
+				  name: 'filter'
+			})
+			export class FilterPipe implements PipeTransform {
+
+			  transform(value: any, filterString:string, propName:string): any {
+			  if(value.length === 10){
+			    return value
+			  }
+			  const resultArray =[];
+			  for(const item of value){
+    
+			    if(item[propName] === filterString){
+			      resultArray.push(item);
+			    }    
+			  }
+			  return resultArray;
+			  }
+			}
+	Pure & impure pipes: 
+		ex:- In filter.pipe.ts:-
+			@Pipe({
+			  name: 'filter',
+			  pure: false
+			})
+	Pure Pipe:- A pure pipe is only called when Angular detects a change in the value or the parameters passed to a pipe.
+
+	Impure Pipe:- An impure pipe is called for every change detection cycle no matter whether the value or parameter(s) changes.
+
+                  This is relevant for changes that are not detected by Angular
+
+	when you pass an array or object that got the content changed (but is still the same instance)
+	when the pipe injects a service to get access to other values, Angular doesn't recognize if they have changed.
+	In these cases you probably still want the pipe to be executed.
+
+	You should be aware that impure pipes are prone to be inefficient. For example when an array is passed into the pipe to filter, sort, ... 
+	then this work might be done every time change detection runs (which is quite often especially with the default ChangeDetectionStrategy setting) event though the array might not even have changed.
+	 Your pipe should try to recognize this and for example return cached results.
+	
+	Async Pipe:
+	ex:- In ap.component.ts:-
+		appStatus = new Promise((resolve,reject)=>{
+		    setTimeout(()=>{
+		      resolve('stable');
+			},2000)
+		  })
+	    In app.component.html:-
+		<p>{{appStatus | async}}</p>
+13)Http Request:-
+
+	a)POST request:-
+	      i.First we need to import HttpClientModule and need to include in imports array.
+	      ii.Now in our component we need to import HttpClient in in ts file
+	      iii.Then we need to make post/Get//put request and we need to subscribe for the response.
+		ex:- In app.module.ts:			
+			import { HttpClientModule } from '@angular/common/http';
+			
+			@NgModule({
+			  declarations: [AppComponent],
+			  imports: [BrowserModule, FormsModule, HttpClientModule],
+			  providers: [],
+			  bootstrap: [AppComponent]
+			})
+		    In app.component.ts:-
+			import { Component, OnInit } from '@angular/core';
+			import { HttpClient } from '@angular/common/http';
+
+			@Component({
+			  selector: 'app-root',
+			  templateUrl: './app.component.html',
+			  styleUrls: ['./app.component.css']
+			})
+			export class AppComponent implements OnInit {
+			  loadedPosts = [];
+
+			  constructor(private http: HttpClient) {}
+
+			  ngOnInit() {}
+
+			  onCreatePost(postData: { title: string; content: string }) {
+			    // Send Http request
+			    this.http.post('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json',
+			    postData).subscribe( responseData =>{
+			      console.log(responseData);
+			    })
+			  }
+			}
+	b)Getting Data:-
+		ex:- In app.component.ts
+			import { Component, OnInit } from '@angular/core';
+			import { HttpClient } from '@angular/common/http';
+			import { map } from 'rxjs/operators'; 
+
+			@Component({
+			  selector: 'app-root',
+			  templateUrl: './app.component.html',
+			  styleUrls: ['./app.component.css']
+			})
+			export class AppComponent implements OnInit {
+			  loadedPosts = [];
+
+			  constructor(private http: HttpClient) {}
+
+			  ngOnInit() {
+			    this.fetchPosts();
+			  }
+
+			  onFetchPosts() {
+			    // Send Http request
+			    this.fetchPosts();
+			  }
+
+			  private fetchPosts(){
+			    this.http.get('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json')
+			    .subscribe(
+			      posts=>{
+			        console.log(posts);
+			      }
+			    )
+			  }
+			}
+	c)Transforming Response Data using Rxjs operators and using types with https client:-
+		ex:- In app.component.ts
+			import { Component, OnInit } from '@angular/core';
+			import { HttpClient } from '@angular/common/http';
+			import { map } from 'rxjs/operators'; 
+			import { Post } from "./post.model";
+
+			@Component({
+			  selector: 'app-root',
+			  templateUrl: './app.component.html',
+			  styleUrls: ['./app.component.css']
+			})
+			export class AppComponent implements OnInit {
+			  loadedPosts : Post[]= [];
+
+			  constructor(private http: HttpClient) {}
+
+			  ngOnInit() {
+			    this.fetchPosts();
+			  }
+
+			  onCreatePost(postData: Post) {
+			    // Send Http request
+			    this.http.post<{name: string}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json',
+			    postData).
+			    subscribe( responseData =>{
+			      console.log(responseData);
+			    })
+			  }
+
+			  onFetchPosts() {
+			    // Send Http request
+			    this.fetchPosts();
+			  }
+
+			  private fetchPosts(){
+			    this.http.get<{ [ key: string ] : Post}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json')
+ 			   .pipe(
+			      map( responseData =>{
+ 			       const postsArray : Post[] = [];
+   				     for(const key in responseData){
+				          if(responseData.hasOwnProperty(key)){
+				            postsArray.push({...responseData[key], id:key});
+			          }
+			        }
+			        return postsArray;
+			      })
+			    )
+			    .subscribe(
+			      posts=>{
+			        this.loadedPosts=posts;
+			      }
+			    )
+			  }
+			}
+
+			In post.model.ts:-
+				export interface Post{
+				    title: String,
+				    content: String,
+				    id?: String
+				}
+
+		d)Displaying Posts and adding loader:-
+			ex:- In app.component.html
+				<div class="row">
+				    <div class="col-xs-12 col-md-6 col-md-offset-3">
+				      <p *ngIf="loadedPosts.length <1 && !isFetching">No posts available!</p>
+				      <ul class="list-group" *ngIf="loadedPosts.length >=1 && !isFetching">
+				        <li class="list-group-item" *ngFor="let post of loadedPosts">
+				          <h3>{{post.title}}</h3>
+				          <p>{{post.content}}</p>
+				        </li>
+				      </ul>
+				      <p *ngIf="isFetching">Loading.....</p>
+				    </div>
+				  </div>
+			In app.component.ts:-
+				import { Component, OnInit } from '@angular/core';
+				import { HttpClient } from '@angular/common/http';
+				import { map } from 'rxjs/operators'; 
+				import { Post } from "./post.model";
+
+				@Component({
+				  selector: 'app-root',
+				  templateUrl: './app.component.html',
+				  styleUrls: ['./app.component.css']
+				})
+				export class AppComponent implements OnInit {
+				  isFetching = false;
+				  loadedPosts : Post[]= [];
+
+				  constructor(private http: HttpClient) {}
+
+				  ngOnInit() {
+				    this.fetchPosts();
+				  }
+
+				  onCreatePost(postData: Post) {
+				    // Send Http request
+				    this.http.post<{name: string}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json',
+				    postData).
+				    subscribe( responseData =>{
+				      console.log(responseData);
+				    })
+				  }
+
+				  onFetchPosts() {
+				    // Send Http request
+				    this.fetchPosts();
+				  }
+				  private fetchPosts(){
+				    this.isFetching = true;
+				    this.http.get<{ [ key: string ] : Post}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json')
+				    .pipe(
+				      map( responseData =>{
+				        const postsArray : Post[] = [];
+				        for(const key in responseData){
+				          if(responseData.hasOwnProperty(key)){
+				            postsArray.push({...responseData[key], id:key});
+				          }
+					        }
+			        return postsArray;
+			      })
+			    )
+			    .subscribe(
+			      posts=>{
+			        this.isFetching = false;
+			        this.loadedPosts=posts;
+			      }
+			    )
+			  }
+			}
+		e)Using Services for Http Requests
+			ex: In post.service.ts
+				import { HttpClient } from "@angular/common/http";
+				import { Injectable } from "@angular/core";
+				import { map } from 'rxjs/operators'; 
+				import { Post } from "./post.model";
+
+				@Injectable({providedIn:'root'})
+				export class PostService{
+				    constructor(private http: HttpClient){}
+
+				    createAndStorePosts(title: string,content:string){
+				        const postData : Post = {title:title, content:content}
+				        this.http.post<{name: string}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json',
+				        postData).
+				        subscribe( responseData =>{
+				          console.log(responseData);
+				        })
+				    }
+
+				    fetchPosts(){
+				        return this.http.get<{ [ key: string ] : Post}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json')
+				    .pipe(
+				      map( responseData =>{
+				        const postsArray : Post[] = [];
+				        for(const key in responseData){
+				          if(responseData.hasOwnProperty(key)){
+				            postsArray.push({...responseData[key], id:key});
+				          }
+				        }
+				        return postsArray;
+				      })
+				    )    
+				    }
+				}
+			     In app.component.ts:-
+				import { Component, OnInit } from '@angular/core';
+				import { HttpClient } from '@angular/common/http';
+
+				import { Post } from "./post.model";
+				import { PostService } from './post.service';
+
+				@Component({
+				  selector: 'app-root',
+				  templateUrl: './app.component.html',
+				  styleUrls: ['./app.component.css']
+				})
+				export class AppComponent implements OnInit {
+				  isFetching = false;
+				  loadedPosts : Post[]= [];
+				constructor(private http: HttpClient, private postService: PostService) {}
+
+				  ngOnInit() {
+				    this.isFetching = true;
+				    this.postService.fetchPosts().subscribe(
+				      posts=>{
+				          this.isFetching = false;
+				          this.loadedPosts = posts;
+				      }
+				    );
+				  }
+
+				  onCreatePost(postData: Post) {
+				    // Send Http request
+				    this.postService.createAndStorePosts(postData.title,postData.content)
+				  }
+
+				  onFetchPosts() {
+				    // Send Http request
+				    this.isFetching = true;
+				    this.postService.fetchPosts().subscribe(
+				      posts=>{
+				          this.isFetching = false;
+				          this.loadedPosts = posts;
+				      }
+				    );
+				  }
+				}
+			f)Deleting Request:-
+				ex:-In posts.service.ts
+					 deletePosts(){
+					        return this.http.delete('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json')
+					    }
+				     In app.component.ts:-
+					 onClearPosts() {
+					    // Send Http request
+						    this.postService.deletePosts().subscribe(()=>{
+						      this.loadedPosts = [];
+						    })
+						  }
+			g)Handling errors:-
+				ex:- In app.component.ts
+					 ngOnInit() {
+					    this.isFetching = true;
+					    this.postService.fetchPosts().subscribe(
+					      posts=>{
+					          this.isFetching = false;
+					          this.loadedPosts = posts;
+					      }, error =>{
+					        this.error = error.message;
+					      }
+					    );
+					  }
+					 onFetchPosts() {
+					    // Send Http request
+					    this.isFetching = true;
+					    this.postService.fetchPosts().subscribe(
+					      posts=>{
+					          this.isFetching = false;
+					          this.loadedPosts = posts;
+					      }, error =>{
+					        this.error = error.message;
+					      }
+					    );
+					  }
+				     In app.component.html:-
+					 <p *ngIf="isFetching && !error">Loading.....</p>
+					      <div class="alert alert-danger" *ngIf="error">
+					        <h1>An error Occured</h1>
+					        <p>{{error}}</p>
+					      </div>
+			h)Handling erors using Subjects:- This we will do when we are subscribing to service call in service file and just making calling service form our component.
+				ex:- In Posts.service.ts
+					import { Subject } from 'rxjs';
+
+					@Injectable({providedIn:'root'})
+					export class PostService{
+					   error = new Subject<string>();
+
+					    constructor(private http: HttpClient){}
+
+					    createAndStorePosts(title: string,content:string){
+					        const postData : Post = {title:title, content:content}
+					        this.http.post<{name: string}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json',
+					        postData).
+					        subscribe( responseData =>{
+					          console.log(responseData);
+					        }, error =>{
+					          this.error.next(error.message)
+					        })
+					    }
+				         In app.component.ts:-
+					import { Subscription } from 'rxjs';
+
+					export class AppComponent implements OnInit, OnDestroy {
+
+					  error = null;
+					  private errorSub: Subscription;
+
+					ngOnInit() {
+					   this.errorSub  = this.postService.error.subscribe( errorMessage=>{
+					      this.error = errorMessage;
+					    })
+					}
+					  ngOnDestroy(): void {
+					      this.errorSub.unsubscribe();
+					  }
+					}
+					Note:- here we are manually unsubscribing the subscription made for error message.
+
+			I)Using catchError operator:- 
+				ex:- In posts.service.com
+
+				import { Subject, throwError } from 'rxjs';
+				
+				fetchPosts(){
+				        return this.http.get<{ [ key: string ] : Post}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json')
+					    .pipe(
+					      map( responseData =>{
+					        const postsArray : Post[] = [];
+					        for(const key in responseData){
+					          if(responseData.hasOwnProperty(key)){
+					            postsArray.push({...responseData[key], id:key});
+					          }
+					        }
+					        return postsArray;
+					      }),
+					      catchError(errorRes =>{
+					        return throwError(errorRes);
+					      })
+					    )    
+					    }
+			j)Setting Headers & adding Query Params:
+				ex:- In posts.service.com
+					import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+
+					 fetchPosts(){
+					        return this.http.get<{ [ key: string ] : Post}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json',
+					        {
+					          headers: new HttpHeaders({'Custom-Header': 'Hello'}),
+					          params: new HttpParams().set('print','pretty')
+					        })
+					  }
+				for multiple query params we do like below:-
+				fetchPosts(){
+					let searchParams = new HttpParams();
+					searchParams = searchParams.append('print','pretty')
+					searchParams = searchParams.append('custom','key')
+					        return this.http.get<{ [ key: string ] : Post}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json',
+					        {
+					          headers: new HttpHeaders({'Custom-Header': 'Hello'}),
+					          params: searchParams
+					        })
+					  }
+			k)Observing different type of responses and Response Body type:-
+
+			 i.Here we have different observe types body,response,event. 
+			 ii.Where cpmes to response type we have json,text.
+			ex:- In posts.ts
+				import { catchError, map, tap } from 'rxjs/operators'; 
+				import { HttpClient, HttpEventType, HttpHeaders, HttpParams } from "@angular/common/http";
+
+				createAndStorePosts(title: string,content:string){
+				        const postData : Post = {title:title, content:content}
+				this.http.post<{name: string}>('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json',
+				        postData,{
+				            observe: 'response'
+					responseType: 'json'
+				        }) 
+				}
+
+				 deletePosts(){
+				        return this.http.delete('https://ng-complete-guide-e0be2-default-rtdb.firebaseio.com/posts.json',{
+				          observe:'events',
+				          responseType: 'text'
+				        }).pipe(
+				          tap(event =>{
+				            console.log(event)
+				            if(event.type === HttpEventType.Sent){
+
+				            }
+				            if(event.type === HttpEventType.Response){
+				              console.log(event.body)
+				            }
+				          })
+				        )
+				    }
+			l)Interceptors:-
+				ex:- In app.module.ts
+					import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+					import { AuthInterceptorService } from './auth-interceptor.service';
+
+					@NgModule({
+						  providers: [{
+								  provide:HTTP_INTERCEPTORS,
+								  useClass:AuthInterceptorService,
+								  multi:true
+								}]
+								})
+				    In auth-Interceptors.service.ts:-
+					import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
+
+					export class AuthInterceptorService implements HttpInterceptor{
+					    intercept(req: HttpRequest<any>, next: HttpHandler)  {
+					        console.log('request on its way')
+					        console.log(req.url)
+					       const modifiedrequest = req.clone({headers: req.headers.append('auth','xyz')})
+					        return next.handle(req);
+					    }
+					}
+			  alternating interceptors:-
+				ex:- In auth-Interceptors.service.ts:-
+					import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
+
+					export class AuthInterceptorService implements HttpInterceptor{
+					    intercept(req: HttpRequest<any>, next: HttpHandler)  {
+					        console.log('request on its way')
+					        console.log(req.url)
+					       const modifiedrequest = req.clone({headers: req.headers.append('auth','xyz')})
+					        return next.handle(modifiedrequest );
+					    }
+					}
+			Responses Interceptors:-
+				ex:- In auth-Interceptors.service.ts:-
+					import { HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
+					import { tap } from "rxjs/operators";
+
+					export class AuthInterceptorService implements HttpInterceptor{
+					    intercept(req: HttpRequest<any>, next: HttpHandler)  {
+					        console.log('request on its way')
+					        console.log(req.url)
+					       const modifiedrequest = req.clone({headers: req.headers.append('auth','xyz')})
+					        return next.handle(modifiedrequest ).pipe(
+						            tap(event =>{
+						                console.log(event)
+						                if(event.type === HttpEventType.Response){
+						                    console.log('Response arrived, res body');
+						                    console.log(event.body);
+						                }
+						            })
+						        );
+					    }
+					}
+			Multiple Interceptors:-
